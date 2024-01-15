@@ -450,6 +450,3 @@ def notes():
         # Render notes page 
         return render_template("notes.html", user_notes=user_notes)
 
- 
-# TODO: change flask 
-
