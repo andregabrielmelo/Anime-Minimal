@@ -36,12 +36,12 @@
                             <li class="list-group-item">Episodes: {{ anime["episodes"] }}</li>
                             {% endif %}
                             <li class="list-group-item">Status: {{ anime["status"] }}</li>
-                            {% if not airing %}
+                            {% if not anime["airing"] %}
                             <li class="list-group-item">Aired: {{ anime["aired"]["string"] }}</li>
                             {% endif %}
                             <li class="list-group-item">Duration: {{ anime["duration"] }}isode</li>
                             <li class="list-group-item">Rating: {{ anime["rating"] }}</li>
-                            {% if airing %}
+                            {% if anime["airing"] %}
                             <li class="list-group-item">Broadcast: {{ anime["broadcast"]["string"] }}</li>
                             {% endif %}
                             <li class="list-group-item">Producer{% if anime["producers"]|length > 1 %}s{% endif %}:

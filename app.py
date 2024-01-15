@@ -9,12 +9,16 @@ import math
 
 from functions_library import apology, login_required
 
-# Connect do database
-con = sqlite3.connect("AnimeManager.db", check_same_thread=False)
+from dotenv import load_dotenv
 
-# Create a cursor
-db = con.cursor()
+# Get enviroment variables
+load_dotenv()  # Load variables from .env file
+DATABASE_URL = os.getenv("DATABASE_URL")
+SECRET_KEY = os.getenv("SECRET_KEY", os.urandom(12).hex())
 
+# Database
+con = sqlite3.connect(DATABASE_URL, check_same_thread=False) # Connect do database
+db = con.cursor() # Create a cursor
 # Create tables
 db.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, hash BLOB NOT NULL)") # Users table
 con.commit()
@@ -25,7 +29,7 @@ con.commit()
 app = Flask(__name__)
 
 # Secret key
-app.secret_key = os.urandom(12).hex()
+app.secret_key = SECRET_KEY
 
 
 @app.route("/")
@@ -35,6 +39,7 @@ def index():
     # Get top airing animes 
     parameters = {
         "filter": "airing",
+        "page": 1,
         "limit": 5,
     }
     request_TopAiringAnimes = requests.get("https://api.jikan.moe/v4/top/anime", params=parameters) # Request API 
@@ -46,6 +51,7 @@ def index():
     # Get top upcoming animes
     parameters = {
         "filter": "upcoming",
+        "page": 1,
         "limit": 5,
     }
     request_TopUpcomingAnimes = requests.get("https://api.jikan.moe/v4/top/anime", params=parameters) # Request API 
@@ -54,9 +60,21 @@ def index():
     else:
         return apology("Could not get top upcoming animes")
 
-    # Get top animes 
+    # TODO: Get most popular anime
     parameters = {
         "filter": "bypopularity",
+        "page": 1,
+        "limit": 5,
+    }
+    request_TopPopularAnimes = requests.get("https://api.jikan.moe/v4/top/anime", params=parameters) # Request API 
+    if request_TopPopularAnimes.status_code == 200: # If there was not a problem
+        TopPopularAnimes = request_TopPopularAnimes.json()["data"] # Get anime data 
+    else:
+        return apology("Could not get most popular animes")
+
+    # Get top animes 
+    parameters = {
+        "page": 1,
         "limit": 5,
     }
     request_TopAnimes = requests.get("https://api.jikan.moe/v4/top/anime", params=parameters) # Request API 
@@ -65,7 +83,7 @@ def index():
     else:
         return apology("Could not get top animes")
 
-    return render_template("index.html", TopAnimes=TopAnimes, TopAiringAnimes=TopAiringAnimes, TopUpcomingAnimes=TopUpcomingAnimes)
+    return render_template("index.html", TopAnimes=TopAnimes, TopPopularAnimes=TopPopularAnimes, TopAiringAnimes=TopAiringAnimes, TopUpcomingAnimes=TopUpcomingAnimes)
 
 
 @app.route("/register", methods=["GET", "POST"])

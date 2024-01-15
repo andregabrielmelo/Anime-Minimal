@@ -46,7 +46,7 @@
                     </div>
                     <div class="row mb-3">
                         <select class="form-select" name="producer">
-                            <option selected value="">Producers</option>
+                            <option selected value="">Producer</option>
                             {% for producer in producers %}
                             <option value="{{ producer }}">{{ producer }}</option>
                             {% endfor %}
@@ -78,7 +78,7 @@
                     </div>
                     <button aria-expanded="false" aria-controls="genres" class="btn btn-light mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#genres">Genres</button>
                     <div class="collapse" id="genres">
-                        <div class="row">
+                        <div class="row mb-3">
                             {% for genre in genres %}
                             <div class="col-md-3 text-start">
                                 <input type="checkbox" class="form-check-input" id="{{ genre }}" name="genre" value="{{ genre }}">
