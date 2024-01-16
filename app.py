@@ -1,6 +1,7 @@
 import os
 import requests
 
+from dotenv import load_dotenv, find_dotenv
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -9,12 +10,10 @@ import math
 
 from functions_library import apology, login_required
 
-from dotenv import load_dotenv
-
 # Get enviroment variables
-load_dotenv()  # Load variables from .env file
-DATABASE_URL = os.getenv("DATABASE_URL")
-SECRET_KEY = os.getenv("SECRET_KEY", os.urandom(12).hex())
+load_dotenv() # Load variables from .env file
+DATABASE_URL = os.environ.get("DATABASE_URL")
+SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(12).hex())
 
 # Database
 con = sqlite3.connect(DATABASE_URL, check_same_thread=False) # Connect do database
@@ -119,10 +118,10 @@ def register():
         con.commit()
 
         # Query database to get the id of the new user
-        new_user = db.execute("SELECT id FROM users WHERE username = ?", request.form.get("username"))
-
+        new_user = db.execute("SELECT id FROM users WHERE username = ?", request.form.get("username")).fetchone()
+    
         # Remember wich user has registered
-        session["user_id"] = new_user[0][0]
+        session["user_id"] = new_user[0]
 
         # Redirect to the home page 
         return redirect("/")
@@ -155,6 +154,8 @@ def login():
         
         # Ensure username and password match
         userdata = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username")).fetchall()
+        if len(userdata) == 0: # Check if the user exists
+            return apology("User does not exist")
         if not check_password_hash(userdata[0][2], request.form.get("password")):
             return apology("Username or password invalid")
         
